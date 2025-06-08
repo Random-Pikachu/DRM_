@@ -3,6 +3,7 @@ from cryptography.fernet import Fernet
 import os 
 import json
 import datetime
+import uuid
 
 # No. of pages 
 def encryptPDF():
@@ -72,14 +73,17 @@ def createMetaData(email: str, startTime: str, endTime: str, fileName: str, outp
             none
     '''
 
+    fileId = uuid.uuid4()
 
     metadata = {
         "email":email,
         "allowed_ip": "", #will store in on first login
         "startTime": startTime,
         "endTime": endTime,
-        "fileName": fileName
+        "fileName": fileName,
+        "fileId": fileId
     }
+    
     print(outputPath)
 
     parentDir = os.path.dirname(outputPath)
