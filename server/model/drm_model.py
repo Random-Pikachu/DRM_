@@ -2,11 +2,12 @@ from config.connection import db
 from datetime import datetime
 
 class DRM_Mode:
-    collection = db.db.drm_data
 
     @staticmethod
     def insertData(fileId, key, auth):
-        return DRM_Mode.collection.insert_one({
+        collection = db.db.drm_data
+
+        return collection.insert_one({
             "fileId": fileId,
             "key" : key,
             "auth": auth,
@@ -15,22 +16,22 @@ class DRM_Mode:
     
     @staticmethod
     def update_after_first_open(fileId, auth, ip):
-        return DRM_Mode.collection.update_one({
+        collection = db.db.drm_data
+
+        return collection.update_one(
             {"fileId": fileId, "auth": auth},
-            {
-                "$set" :{
-                    "ip": ip
-                }
-            }
-        })
+            {"$set": {"ip": ip}}
+        )
     
     @staticmethod
     def getKey(fileId, auth, open):
+        collection = db.db.drm_data
+
         if (open == 1):
-            doc = DRM_Mode.collection.find_one({
+            doc = collection.find_one({
                "$and":[
                    {"fileId": fileId},
-                   {"email": auth}
+                   {"auth": auth}
                ]
             })
 
@@ -39,7 +40,7 @@ class DRM_Mode:
             
             return None
 
-        doc = DRM_Mode.collection.find_one({
+        doc = collection.find_one({
                "$and":[
                    {"fileId": fileId},
                    {"ip": auth}
@@ -48,3 +49,5 @@ class DRM_Mode:
 
         if doc:
             return doc["key"]
+        
+        return None
