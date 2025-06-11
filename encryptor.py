@@ -8,7 +8,7 @@ import zipfile
 
 
 APP_SECRET = b'QF_uqnUuQISVwIt60COjcJoj8se95orGMJPbxmmk6qY=' # a global key for accessing the key.bin
-# No. of pages 
+
 def encryptPDF():
     """
     Encrypts a PDF file specified by the user and creates associated metadata.
@@ -83,19 +83,6 @@ def encryptPDF():
 
 
 def createMetaData(email: str, startTime: str, endTime: str, fileName: str, outputPath: str = "output/metdata.json"):
-    '''
-        Creates metadata JSON file containing access information of file.
-
-        Args:
-            email (str): Receiver's Email Address
-            startTime (str): Start time of access period (e.g. "2025-06-07 16:10:56")
-            endTime (str): End time of access period (e.g. "2025-06-07 17:10:56")
-            fileName (str): The name of pdf file to be encrypted
-            outputPath (str, optional): Path to store metadata.json
-        
-        Returns:
-            none
-    '''
 
     fileId = uuid.uuid4()
 
@@ -105,7 +92,9 @@ def createMetaData(email: str, startTime: str, endTime: str, fileName: str, outp
         "startTime": startTime,
         "endTime": endTime,
         "fileName": fileName,
-        "fileId": str(fileId)
+        "fileId": str(fileId),
+        "lastUpdated": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "open": 1
     }
     
     print(outputPath)
