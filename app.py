@@ -1,22 +1,15 @@
 import tkinter as tk
 from tkinter import filedialog, messagebox
-from encryptor import encryptPDF  # Ensure encryptor.py has encryptPDF
-from decryptor import main as decrypt_file_main  # We will call main() logic here in wrapper
+from encryptor import encryptPDF
+from decryptor import main
+import datetime
 
-import os
-
-def run_decryption_gui_wrapper(drm_path):
-    try:
-        import decryptor
-        decryptor.main_entrypoint(drm_path)
-    except Exception as e:
-        messagebox.showerror("Decryption Error", str(e))
 
 class DRMApp(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("Secure DRM PDF Application")
-        self.geometry("480x400")
+        self.geometry("480x420")
         self.configure(bg="#f2f2f2")
         self.resizable(True, True)
 
@@ -74,20 +67,27 @@ class DRMApp(tk.Tk):
             self.pdf_path_var.set(path)
 
     def encrypt_file(self):
-        pdf_path = self.pdf_path_var.get()
-        expiry = self.expiry_var.get()
-        allowed_ip = self.allowed_ip_var.get()
-        email = self.email_var.get()
+        pdf_path = self.pdf_path_var.get().strip()
+        expiry = self.expiry_var.get().strip()
+        ip = self.allowed_ip_var.get().strip()
+        email = self.email_var.get().strip()
 
         if not pdf_path or not expiry or not email:
             messagebox.showerror("Missing Info", "PDF path, Expiration date and Email are required.")
             return
 
+        metadata = {
+            "email": email,
+            "startTime": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "endTime": expiry,
+            "allowed_ip": ip
+        }
+
         try:
-            encryptPDF(pdf_path, expiry, allowed_ip, email)  # Adjusted encryptor to accept 4 args
-            messagebox.showinfo("Success", "PDF Protected Successfully!")
+            drm_path = encryptPDF(pdf_path, metadata)
+            messagebox.showinfo("Success", f"DRM file created:\n{drm_path}")
         except Exception as e:
-            messagebox.showerror("Encryption Error", f"{e}")
+            messagebox.showerror("Encryption Error", str(e))
 
     def build_receiver_ui(self):
         tk.Label(self.form_frame, text="Select DRM File", font=("Helvetica", 10), bg="#f2f2f2").pack()
@@ -107,7 +107,11 @@ class DRMApp(tk.Tk):
         if not path:
             messagebox.showerror("Missing Info", "Select a .drm file to open.")
             return
-        run_decryption_gui_wrapper(path)
+        try:
+            main(path)
+        except Exception as e:
+            messagebox.showerror("Decryption Error", str(e))
+
 
 if __name__ == "__main__":
     app = DRMApp()

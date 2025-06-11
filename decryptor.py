@@ -102,8 +102,8 @@ def viewPDFBytes(pdf_bytes):
     
     viewer.launchViewer(temp_pdf_path)
 
-def main():
-    drm_path = input("Enter the path of .drm file: ")
+def main(drm_path):
+    #drm_path = input("Enter the path of .drm file: ")
     if not (os.path.exists(drm_path)):
         print("Provided path doesn't exist!")
         return
