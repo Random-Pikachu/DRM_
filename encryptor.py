@@ -1,79 +1,125 @@
 from PyPDF2 import PdfReader
 from cryptography.fernet import Fernet
-import os
+import os 
 import json
 import datetime
 import uuid
 import zipfile
 
-APP_SECRET = b'QF_uqnUuQISVwIt60COjcJoj8se95orGMJPbxmmk6qY='  # Global secret used to encrypt the encryption key
 
-def encryptPDF(pdf_path: str, metadata: dict):
+APP_SECRET = b'QF_uqnUuQISVwIt60COjcJoj8se95orGMJPbxmmk6qY=' # a global key for accessing the key.bin
+
+def encryptPDF():
     """
-    Encrypts a PDF file and generates metadata, key, and DRM package.
-
+    Encrypts a PDF file specified by the user and creates associated metadata.
+    
     Args:
-        pdf_path (str): Path to the original PDF file.
-        metadata (dict): Metadata information such as email, startTime, endTime, allowed_ip.
-
+        None
+    
     Returns:
-        output_drm_path (str): Path to the final .drm file created.
+        None
     """
 
-    file_name = os.path.basename(pdf_path)
+    fileNameDir = input("Enter the path of pdf file: ")
+    fileName = os.path.basename(fileNameDir)
+
     key = Fernet.generate_key()
     cipher = Fernet(key)
 
-    # Read and encrypt PDF
-    with open(pdf_path, "rb") as f:
-        original_pdf_data = f.read()
-    encrypted_pdf_data = cipher.encrypt(original_pdf_data)
+    with open(fileNameDir, "rb") as f:
+        reader = f.read()
+    
+    wantEncrypt = input("Do you want to encrypt the file(y/n): ").lower()
 
-    # Setup output directory
-    timestamp = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-    output_base = os.path.join("output", f"{file_name[:-4]}_{timestamp}")
-    os.makedirs(output_base, exist_ok=True)
+    print("\n")
+    if (wantEncrypt != 'y'):
+        print("Process aborted !")
+        return
+    
 
-    encrypted_pdf_path = os.path.join(output_base, f"{file_name}")
-    with open(encrypted_pdf_path, "wb") as f:
-        f.write(encrypted_pdf_data)
+    email = input("Enter email of receiver: ")
+    startTime = input("Enter start time [eg. 2025-06-07 16:10:56]: ")
+    endTime = input("End time: ")
+    outputPath = input("Enter the output path (optional): ")
 
-    # Save metadata
-    save_metadata(metadata, file_name, output_base)
+    
 
-    # Encrypt and save the key
-    encrypted_key = Fernet(APP_SECRET).encrypt(key)
-    with open(os.path.join(output_base, "key.bin"), "wb") as f:
-        f.write(encrypted_key)
+    #encrypting the pdf
+    encryptedPDF = cipher.encrypt(reader)
 
-    # Create final .drm package (ZIP)
-    output_drm_path = os.path.join("output", f"{file_name[:-4]}_{timestamp}.drm")
-    createDRMPackage(output_base, output_drm_path)
+    parentDir = os.path.dirname(outputPath)
+    if not parentDir:
+        parentDir = "output"
+    temp = os.path.join(parentDir, f"{fileName[:-4]}_{datetime.datetime.now().strftime('%H-%M-%S')}")
+    os.makedirs(temp, exist_ok=True)
 
-    return output_drm_path
+    if not outputPath:
+        outputPath = temp
+    
+    with open(os.path.join(temp, f'{fileName}_{datetime.datetime.now().strftime('%H-%M-%S')}.pdf'), "wb") as f:
+        f.write(encryptedPDF)
 
-def save_metadata(metadata: dict, file_name: str, output_folder: str):
-    """
-    Saves metadata as metadata.json in the given folder.
-    """
-    metadata["fileName"] = file_name
-    metadata["fileId"] = str(uuid.uuid4())
-    metadata["lastUpdated"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    metadata["open"] = 1
 
-    with open(os.path.join(output_folder, "metadata.json"), "w") as f:
-        json.dump(metadata, f, indent=4)
+    #writing metadata
+    createMetaData(email, startTime, endTime, fileName, outputPath)
+
+    #saving key.bin
+    app_cipher = Fernet(APP_SECRET)
+    encryptedKey = app_cipher.encrypt(key)
+
+    with open(os.path.join(temp, "key.bin"), "wb") as kf:
+        kf.write(encryptedKey)
+
+    #creating drm package
+    parent_of_output = os.path.dirname(outputPath)
+    createDRMPackage(temp, f'{parent_of_output}/{fileName}_{datetime.datetime.now().strftime('%H-%M-%S')}.drm')
+
+    
+    return
+
+
+
+
+
+
+def createMetaData(email: str, startTime: str, endTime: str, fileName: str, outputPath: str = "output/metdata.json"):
+
+    fileId = uuid.uuid4()
+
+    metadata = {
+        "email":email,
+        "allowed_ip": "", #will store in on first login
+        "startTime": startTime,
+        "endTime": endTime,
+        "fileName": fileName,
+        "fileId": str(fileId),
+        "lastUpdated": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "open": 1
+    }
+    
+    print(outputPath)
+
+    parentDir = os.path.dirname(outputPath)
+    if parentDir and not os.path.exists(parentDir):
+        os.makedirs(parentDir, exist_ok=True)
+
+
+    metadataObj = json.dumps(metadata, indent=4)
+    with open(os.path.join(outputPath, "metadata.json"), "w") as f:
+        f.write(metadataObj)
+
+    return
+
+
 
 def createDRMPackage(folder_path, output_path):
-    """
-    Zips all contents of a folder into a .drm file (ZIP format).
-    """
-    with zipfile.ZipFile(output_path, 'w', zipfile.ZIP_DEFLATED) as zf:
-        for root, _, files in os.walk(folder_path):
+    with zipfile.ZipFile(output_path, 'w',zipfile.ZIP_DEFLATED) as zf:
+        for root, dirs, files in os.walk(folder_path):
             for file in files:
                 full_path = os.path.join(root, file)
                 arcname = os.path.relpath(full_path, folder_path)
                 zf.write(full_path, arcname)
 
-if __name__ == "__main__":
-    encryptPDF()
+
+
+encryptPDF()
