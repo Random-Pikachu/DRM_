@@ -121,5 +121,5 @@ def createDRMPackage(folder_path, output_path):
                 zf.write(full_path, arcname)
 
 
-
-encryptPDF()
+if __name__ == "__main__":
+    encryptPDF()

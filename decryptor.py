@@ -149,5 +149,5 @@ def main():
     
     finally:
         shutil.rmtree(tempDir)
-
-main()
+if __name__ == "__main__":
+    main()
