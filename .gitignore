@@ -3,4 +3,3 @@ temp/
 output/
 .env
 __pycache__
-test/
