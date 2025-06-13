@@ -9,7 +9,7 @@ import shutil
 
 APP_SECRET = b'QF_uqnUuQISVwIt60COjcJoj8se95orGMJPbxmmk6qY=' # a global key for accessing the key.bin
 
-def encryptPDF(fileNameDir, startTime, endTime, email, outputPath):
+def encryptPDF(fileNameDir, startTime, endTime, password, outputPath):
     """
     Encrypts a PDF file specified by the user and creates associated metadata.
     
@@ -72,7 +72,7 @@ def encryptPDF(fileNameDir, startTime, endTime, email, outputPath):
 
 
     #writing metadata
-    createMetaData(email, startTime, endTime, fileName, finalOutputPath)
+    createMetaData(password, startTime, endTime, fileName, finalOutputPath)
 
     #saving key.bin
     app_cipher = Fernet(APP_SECRET)
@@ -93,12 +93,12 @@ def encryptPDF(fileNameDir, startTime, endTime, email, outputPath):
 
 
 
-def createMetaData(email: str, startTime: str, endTime: str, fileName: str, outputPath: str = "output/metdata.json"):
+def createMetaData(password: str, startTime: str, endTime: str, fileName: str, outputPath: str = "output/metdata.json"):
 
     fileId = uuid.uuid4()
 
     metadata = {
-        "email":email,
+        "password":password,
         "allowed_ip": "", #will store in on first login
         "startTime": startTime,
         "endTime": endTime,

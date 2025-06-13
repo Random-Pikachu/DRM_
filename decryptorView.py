@@ -37,7 +37,7 @@ class receiverView(ctk.CTkFrame):
         if dir_path:
             self.drm_path.set(dir_path)
 
-    def askEmailDialog(self):
+    def askPasswordDialog(self):
         emailDialog = ctk.CTkInputDialog(text="Enter the email: ", title='Test', font=('Poppins', 13))
         return emailDialog.get_input()
         
@@ -48,7 +48,7 @@ class receiverView(ctk.CTkFrame):
                 raise ValueError("Please enter the .drm path")
                 return
 
-            decryptor.decrypt_drm_file(drm_path=self.drm_path.get(), ask_email= self.askEmailDialog)
+            decryptor.decrypt_drm_file(drm_path=self.drm_path.get(), ask_pass= self.askPasswordDialog)
             
             
 

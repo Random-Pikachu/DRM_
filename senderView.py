@@ -51,7 +51,7 @@ class senderView(ctk.CTkFrame):
         
         # variables in encryptPdf = fileNameDir, email, startTime, endTime, outputPath
         self.fileNameDir = ctk.StringVar()
-        self.email = ctk.StringVar()
+        self.password= ctk.StringVar()
         self.startTime = ctk.StringVar()
         self.endTime = ctk.StringVar()
         self.outputPath = ctk.StringVar()
@@ -104,19 +104,19 @@ class senderView(ctk.CTkFrame):
         #frame for end time
         endFrame = ctk.CTkFrame(self, fg_color="transparent")
         endFrame.pack(pady=(5,5))
-        startLabel = ctk.CTkLabel(endFrame, text="Start Time: ", font=('Poppins', 16), width=30, anchor='w')
+        startLabel = ctk.CTkLabel(endFrame, text="End Time: ", font=('Poppins', 16), width=30, anchor='w')
         startLabel.grid(row=0, column = 0, padx=(0,10), sticky='w')
         dateView(endFrame, target_var=self.endTime).grid(row=0, column=1, columnspan=2, sticky='w')
         endFrame.grid_columnconfigure(1, weight=1)
 
         #frame for email
-        emailFrame = ctk.CTkFrame(self, fg_color='transparent')
-        emailFrame.pack(pady=(5,5))
-        emailLabel = ctk.CTkLabel(emailFrame, text="Email: ", font=('Poppins', 16), anchor='w', width=30)
-        emailLabel.grid(row =0, column=0, padx=(0,10), sticky='w')
-        emailEntry = ctk.CTkEntry(emailFrame, textvariable=self.email, width=350, font=('Poppins', 16))
-        emailEntry.grid(row= 0, column =1, sticky='ew', padx=(0,10))
-        emailEntry.grid_columnconfigure(1, weight=1)
+        passFrame = ctk.CTkFrame(self, fg_color='transparent')
+        passFrame.pack(pady=(5,5))
+        passLabel = ctk.CTkLabel(passFrame, text="Password: ", font=('Poppins', 16), anchor='w', width=30)
+        passLabel.grid(row =0, column=0, padx=(0,10), sticky='w')
+        passEntry = ctk.CTkEntry(passFrame, textvariable=self.password, width=350, font=('Poppins', 16))
+        passEntry.grid(row= 0, column =1, sticky='ew', padx=(0,10))
+        passEntry.grid_columnconfigure(1, weight=1)
 
         #frame for outputPath
         outputFrame = ctk.CTkFrame(self, fg_color='transparent')
@@ -156,7 +156,7 @@ class senderView(ctk.CTkFrame):
                 fileNameDir=self.fileNameDir.get(),
                 startTime=self.startTime.get(),
                 endTime=self.endTime.get(),
-                email=self.email.get(),
+                password=self.password.get(),
                 outputPath=self.outputPath.get()
             )
 
