@@ -1,7 +1,9 @@
-# from encryptor import encryptPDF
+from encryptor import encryptPDF
 import customtkinter as ctk
 from customtkinter import filedialog
 from datetime import datetime
+from tkinter import messagebox
+
 
 class dateView(ctk.CTkFrame):
     def __init__(self, master, target_var):
@@ -129,7 +131,7 @@ class senderView(ctk.CTkFrame):
         outputFrame.grid_columnconfigure(1, weight=1)
 
 
-        ctk.CTkButton(self, text='Submit', command=self.print_d).pack(pady=40)
+        ctk.CTkButton(self, text='Encrypt File', command=self.handleEncrypt, font=('Poppins', 16),fg_color="#2b6cb0").pack(pady=40)
 
 
     def selectDir(self, target_var):
@@ -145,8 +147,23 @@ class senderView(ctk.CTkFrame):
         if dirPath: 
             target_var.set(dirPath)
 
-    def print_d(self):
-        print(f'{self.fileNameDir.get()} \n{self.startTime.get()} \n{self.endTime.get()} \n{self.email.get()} \n{self.outputPath.get()}')
+    def handleEncrypt(self):
+        try:
+            if not all ([self.fileNameDir.get(), self.startTime.get(), self.endTime.get(), self.email.get()]):
+                raise ValueError("Fill all the required fields")
+
+            drm_path = encryptPDF(
+                fileNameDir=self.fileNameDir.get(),
+                startTime=self.startTime.get(),
+                endTime=self.endTime.get(),
+                email=self.email.get(),
+                outputPath=self.outputPath.get()
+            )
+
+            messagebox.showinfo(message=f"Success, package created at: \n{drm_path}", title="Success")
+        
+        except Exception as e:
+            messagebox.showerror("Error", str(e))
         
 
 def run_gui():
