@@ -5,7 +5,7 @@ import tempfile
 import zipfile
 import json
 from datetime import datetime
-import viewer
+import appfile.viewer as viewer
 import shutil
 from getmac import get_mac_address
 

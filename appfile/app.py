@@ -1,6 +1,6 @@
 import customtkinter as ctk
-from senderView import senderView 
-from decryptorView import receiverView
+from appfile.senderView import senderView 
+from appfile.decryptorView import receiverView
 
 class App(ctk.CTk):
     def __init__(self):

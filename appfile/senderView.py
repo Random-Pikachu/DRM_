@@ -1,4 +1,4 @@
-from encryptor import encryptPDF
+from appfile.encryptor import encryptPDF
 import customtkinter as ctk
 from customtkinter import filedialog
 from datetime import datetime
