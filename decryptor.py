@@ -65,32 +65,36 @@ def saveMetadata(path, metadata):
 def updateZipWithMetadata(drm_path, metadata_path):
     with open(metadata_path, 'r') as f:
         updated_metadata = f.read()
+    
+    temp_zip_path = tempfile.NamedTemporaryFile(delete=False, suffix=".drm").name
 
-    with zipfile.ZipFile(drm_path, 'r') as zin:
-        temp_zip = tempfile.NamedTemporaryFile(delete=False, suffix=".drm")
-        with zipfile.ZipFile(temp_zip.name, 'w') as zout:
-            for item in zin.infolist():
-                if item.filename == "metadata.json":
-                    zout.writestr("metadata.json", updated_metadata)
-                else:
-                    zout.writestr(item.filename, zin.read(item.filename))
-    shutil.move(temp_zip.name, drm_path)
+    with zipfile.ZipFile(drm_path, 'r') as zin, zipfile.ZipFile(temp_zip_path, 'w', zipfile.ZIP_DEFLATED) as zout:
+         for item in zin.infolist():
+            if item.filename == "metadata.json":
+                zout.writestr("metadata.json", updated_metadata)
+            else:
+                zout.writestr(item.filename, zin.read(item.filename))
+    
+    os.remove(drm_path)
+    shutil.move(temp_zip_path, drm_path)
 
 
 
-def firstTime(metadata_path, metadata):
+def firstTime(metadata_path, metadata, ask_email):
     if metadata["open"] == 1:
-        input_email = input("enter the email: ")
+        # input_email = input("enter the email: ")
+        input_email = ask_email()
+
         if input_email == metadata["email"]:
             metadata["allowed_ip"] = getIP()
             metadata["open"] = 0
             metadata["lastUpdated"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             saveMetadata(metadata_path, metadata)
-            print("First-time setup complete. Access granted.")
+            # print("First-time setup complete. Access granted.")
             return metadata
         
         else:
-            print("Failed auth")
+            raise ValueError("Failed auth")
             return None
     
     return metadata
@@ -104,11 +108,12 @@ def viewPDFBytes(pdf_bytes):
     
     viewer.launchViewer(temp_pdf_path)
 
-def main():
-    drm_path = input("Enter the path of .drm file: ")
+def decrypt_drm_file(drm_path, ask_email):
+    # drm_path = input("Enter the path of .drm file: ")
     if not (os.path.exists(drm_path)):
-        print("Provided path doesn't exist!")
-        return
+        # print("Provided path doesn't exist!")
+        # return
+        raise FileNotFoundError("Provided path doesn't exist!")
 
 
     tempDir = extractDRM(drm_path=drm_path)
@@ -123,23 +128,24 @@ def main():
                 break
         
         if not all([os.path.exists(metadata_path), os.path.exists(key_path), os.path.exists(pdf_path)]):
-            print("Invalid DRM package")
-            return
+            # print("Invalid DRM package")
+            # return
+            raise ValueError("Invalid DRM Package")
         
         metadata= loadMetadata(metadata_path)
 
         
         if metadata["allowed_ip"] == "":
-            metadata = firstTime(metadata_path, metadata)
+            metadata = firstTime(metadata_path, metadata, ask_email)
             if metadata is None:
-                return
+                raise PermissionError("Password Authenthication Failed!")
         
         if not isAccessAllowd(metadata):
-            print("IP Access restricted")
-            return 
-        
+            # print("IP Access restricted")
+            # return 
+            raise PermissionError("MAC Address mismatch")        
 
-        print("File Opened!")
+        # print("File Opened!")
         pdf_key = decryptKey(key_path)
         decryptPDF_bytes = decryptPDF(pdf_path, pdf_key)
 
@@ -147,9 +153,9 @@ def main():
         updateZipWithMetadata(drm_path, metadata_path)
 
     except Exception as e:
-        print("error: ", e)
+        raise RuntimeError("error: ", e)
     
     finally:
         shutil.rmtree(tempDir)
 
-main()
+# main()
