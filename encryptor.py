@@ -5,11 +5,11 @@ import json
 import datetime
 import uuid
 import zipfile
-
+import shutil
 
 APP_SECRET = b'QF_uqnUuQISVwIt60COjcJoj8se95orGMJPbxmmk6qY=' # a global key for accessing the key.bin
 
-def encryptPDF():
+def encryptPDF(fileNameDir, startTime, endTime, email, outputPath):
     """
     Encrypts a PDF file specified by the user and creates associated metadata.
     
@@ -20,7 +20,7 @@ def encryptPDF():
         None
     """
 
-    fileNameDir = input("Enter the path of pdf file: ")
+    # fileNameDir = input("Enter the path of pdf file: ")
     fileName = os.path.basename(fileNameDir)
 
     key = Fernet.generate_key()
@@ -29,53 +29,64 @@ def encryptPDF():
     with open(fileNameDir, "rb") as f:
         reader = f.read()
     
-    wantEncrypt = input("Do you want to encrypt the file(y/n): ").lower()
+    # wantEncrypt = input("Do you want to encrypt the file(y/n): ").lower()
 
-    print("\n")
-    if (wantEncrypt != 'y'):
-        print("Process aborted !")
-        return
+    # print("\n")
+    # if (wantEncrypt != 'y'):
+    #     print("Process aborted !")
+    #     return
     
 
-    email = input("Enter email of receiver: ")
-    startTime = input("Enter start time [eg. 2025-06-07 16:10:56]: ")
-    endTime = input("End time: ")
-    outputPath = input("Enter the output path (optional): ")
+    # email = input("Enter email of receiver: ")
+    # startTime = input("Enter start time [eg. 2025-06-07 16:10:56]: ")
+    # endTime = input("End time: ")
+    # outputPath = input("Enter the output path (optional): ")
 
     
 
     #encrypting the pdf
     encryptedPDF = cipher.encrypt(reader)
 
-    parentDir = os.path.dirname(outputPath)
-    if not parentDir:
-        parentDir = "output"
-    temp = os.path.join(parentDir, f"{fileName[:-4]}_{datetime.datetime.now().strftime('%H-%M-%S')}")
-    os.makedirs(temp, exist_ok=True)
+    # parentDir = os.path.dirname(outputPath)
+
+    
+    # if not parentDir:
+    #     parentDir = "output"
+
+
+    # temp = os.path.join(parentDir, f"{fileName[:-4]}_{datetime.datetime.now().strftime('%H-%M-%S')}")
+
+
+    # os.makedirs(temp, exist_ok=True)
 
     if not outputPath:
-        outputPath = temp
+        base_output = 'output'
+    else:
+        base_output=outputPath
     
-    with open(os.path.join(temp, f'{fileName}_{datetime.datetime.now().strftime('%H-%M-%S')}.pdf'), "wb") as f:
+    finalOutputPath = os.path.join(base_output, f"{fileName[:-4]}_{datetime.datetime.now().strftime('%H-%M-%S')}")
+    os.makedirs(finalOutputPath, exist_ok=True)
+    
+    with open(os.path.join(finalOutputPath, f'{fileName}_{datetime.datetime.now().strftime('%H-%M-%S')}.pdf'), "wb") as f:
         f.write(encryptedPDF)
 
 
     #writing metadata
-    createMetaData(email, startTime, endTime, fileName, outputPath)
+    createMetaData(email, startTime, endTime, fileName, finalOutputPath)
 
     #saving key.bin
     app_cipher = Fernet(APP_SECRET)
     encryptedKey = app_cipher.encrypt(key)
 
-    with open(os.path.join(temp, "key.bin"), "wb") as kf:
+    with open(os.path.join(finalOutputPath, "key.bin"), "wb") as kf:
         kf.write(encryptedKey)
 
     #creating drm package
     parent_of_output = os.path.dirname(outputPath)
-    createDRMPackage(temp, f'{parent_of_output}/{fileName}_{datetime.datetime.now().strftime('%H-%M-%S')}.drm')
+    createDRMPackage(finalOutputPath, f'{finalOutputPath}.drm')
 
     
-    return
+    return finalOutputPath
 
 
 
@@ -120,6 +131,4 @@ def createDRMPackage(folder_path, output_path):
                 arcname = os.path.relpath(full_path, folder_path)
                 zf.write(full_path, arcname)
 
-
-
-encryptPDF()
+    shutil.rmtree(folder_path)
