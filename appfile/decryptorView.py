@@ -1,5 +1,5 @@
 import customtkinter as ctk
-import appfile.decryptor as decryptor
+import decryptor as decryptor
 from customtkinter import filedialog
 from tkinter import messagebox
 from customtkinter import CTkToplevel
