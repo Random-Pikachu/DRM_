@@ -80,12 +80,12 @@ def updateZipWithMetadata(drm_path, metadata_path):
 
 
 
-def firstTime(metadata_path, metadata, ask_email):
+def firstTime(metadata_path, metadata, ask_pass):
     if metadata["open"] == 1:
         # input_email = input("enter the email: ")
-        input_email = ask_email()
+        input_email = ask_pass()
 
-        if input_email == metadata["email"]:
+        if input_email == metadata["password"]:
             metadata["allowed_ip"] = getIP()
             metadata["open"] = 0
             metadata["lastUpdated"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -108,7 +108,7 @@ def viewPDFBytes(pdf_bytes):
     
     viewer.launchViewer(temp_pdf_path)
 
-def decrypt_drm_file(drm_path, ask_email):
+def decrypt_drm_file(drm_path, ask_pass):
     # drm_path = input("Enter the path of .drm file: ")
     if not (os.path.exists(drm_path)):
         # print("Provided path doesn't exist!")
@@ -136,7 +136,7 @@ def decrypt_drm_file(drm_path, ask_email):
 
         
         if metadata["allowed_ip"] == "":
-            metadata = firstTime(metadata_path, metadata, ask_email)
+            metadata = firstTime(metadata_path, metadata, ask_pass)
             if metadata is None:
                 raise PermissionError("Password Authenthication Failed!")
         
