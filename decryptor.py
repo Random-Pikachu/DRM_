@@ -7,14 +7,16 @@ import json
 from datetime import datetime
 import viewer
 import shutil
+from getmac import get_mac_address
 
 APP_SECRET = b'QF_uqnUuQISVwIt60COjcJoj8se95orGMJPbxmmk6qY=' # a global key for accessing the key.bin
 
 
 
 def getIP():
-    hostName = socket.gethostname()
-    return socket.gethostbyname(hostName)
+    # hostName = socket.gethostname()
+    # return socket.gethostbyname(hostName)
+    return get_mac_address()
 
 def extractDRM(drm_path):
     tempDir = tempfile.mkdtemp()
