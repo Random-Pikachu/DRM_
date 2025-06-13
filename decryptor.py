@@ -65,16 +65,18 @@ def saveMetadata(path, metadata):
 def updateZipWithMetadata(drm_path, metadata_path):
     with open(metadata_path, 'r') as f:
         updated_metadata = f.read()
+    
+    temp_zip_path = tempfile.NamedTemporaryFile(delete=False, suffix=".drm").name
 
-    with zipfile.ZipFile(drm_path, 'r') as zin:
-        temp_zip = tempfile.NamedTemporaryFile(delete=False, suffix=".drm")
-        with zipfile.ZipFile(temp_zip.name, 'w') as zout:
-            for item in zin.infolist():
-                if item.filename == "metadata.json":
-                    zout.writestr("metadata.json", updated_metadata)
-                else:
-                    zout.writestr(item.filename, zin.read(item.filename))
-    shutil.move(temp_zip.name, drm_path)
+    with zipfile.ZipFile(drm_path, 'r') as zin, zipfile.ZipFile(temp_zip_path, 'w', zipfile.ZIP_DEFLATED) as zout:
+         for item in zin.infolist():
+            if item.filename == "metadata.json":
+                zout.writestr("metadata.json", updated_metadata)
+            else:
+                zout.writestr(item.filename, zin.read(item.filename))
+    
+    os.remove(drm_path)
+    shutil.move(temp_zip_path, drm_path)
 
 
 

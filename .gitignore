@@ -4,3 +4,4 @@ output/
 .env
 __pycache__
 /test
+temp___
