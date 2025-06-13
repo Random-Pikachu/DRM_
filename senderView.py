@@ -63,7 +63,7 @@ class senderView(ctk.CTkFrame):
 
         #Frame for directory inp 
         dirFrame = ctk.CTkFrame(self, fg_color="transparent")
-        dirFrame.pack(pady=(50, 0))
+        dirFrame.pack(pady=(0, 0))
         
         #Lable for frame1
         dirLabel = ctk.CTkLabel(dirFrame, text="PDF Path: ", font=('Poppins', 16), width=30, anchor='w')
