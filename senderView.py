@@ -149,7 +149,7 @@ class senderView(ctk.CTkFrame):
 
     def handleEncrypt(self):
         try:
-            if not all ([self.fileNameDir.get(), self.startTime.get(), self.endTime.get(), self.email.get()]):
+            if not all ([self.fileNameDir.get(), self.startTime.get(), self.endTime.get(), self.password.get()]):
                 raise ValueError("Fill all the required fields")
 
             drm_path = encryptPDF(
