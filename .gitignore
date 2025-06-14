@@ -5,4 +5,7 @@ output/
 __pycache__
 /test
 temp___
-
+build/
+dist/
+app.spec
+server/
