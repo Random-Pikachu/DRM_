@@ -1,5 +1,5 @@
 import customtkinter as ctk
-import decryptor
+import decryptor as decryptor
 from customtkinter import filedialog
 from tkinter import messagebox
 from customtkinter import CTkToplevel
@@ -38,7 +38,7 @@ class receiverView(ctk.CTkFrame):
             self.drm_path.set(dir_path)
 
     def askPasswordDialog(self):
-        emailDialog = ctk.CTkInputDialog(text="Enter the email: ", title='Test', font=('Poppins', 13))
+        emailDialog = ctk.CTkInputDialog(text="Enter the Password: ", title='Test', font=('Poppins', 13))
         return emailDialog.get_input()
         
 
