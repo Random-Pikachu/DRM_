@@ -1,9 +1,4 @@
 <h1 align="center" id="title">SecurePDF </h1>
-<p align="center">
-  <a href="https://github.com/zorro1107/DRM">
-    <img src="https://img.shields.io/badge/active--fork-SecurePDF-blue" alt="Active Fork">
-  </a>
-</p>
 <p style = "font-size:16px; ">A standalone offline <strong>Digital Rights Management (DRM)</strong> desktop application built using Python, CustomTkinter, and AES encryption. This tool allows secure sharing and controlled viewing of PDF documents, with features to restrict printing, copying, and unauthorized access.</p>
 
 <h2>💻 Tech Stack</h2>
