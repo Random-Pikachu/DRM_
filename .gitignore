@@ -8,3 +8,5 @@ temp___
 build/
 dist/
 app.spec
+server/
+DRM_env/
